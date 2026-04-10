@@ -1,6 +1,25 @@
-# Farewell Card for Eveline
+# Farewell Card
 
-A collaborative farewell card where the whole team can pin sticky-note messages, doodles, and photos on a shared board. Notes persist across page refreshes and are visible to everyone in real time.
+A reusable, white-label collaborative farewell card where the whole team can pin sticky-note messages and doodles on a shared board. Notes persist across page refreshes and are visible to everyone in real time.
+
+## Live Demo
+
+<https://shopee-farewell-card.vercel.app/>
+
+## Personalizing for a New Recipient
+
+The card uses the placeholder `{{RECIPIENT_NAME}}` in several places. To customize it for a specific person, find-and-replace the placeholder with their name in these files:
+
+| File | Locations |
+|------|-----------|
+| `index.html` | `<title>`, `<h1>` heading, compose form `<h3>`, card-view `<h2>` |
+| `app.js` | Demo message shown when JSONBin is not configured |
+
+For example, to make a card for **Alice**:
+
+```bash
+sed -i 's/{{RECIPIENT_NAME}}/Alice/g' index.html app.js
+```
 
 ## Quick Start
 
@@ -14,6 +33,19 @@ A collaborative farewell card where the whole team can pin sticky-note messages,
 5. Open `index.html` in a browser (or deploy to any static host)
 
 > **Important:** `config.js` is git-ignored to keep your API keys out of version control. Never commit it. The repository includes `config.example.js` as a template.
+
+## Features
+
+- Pin sticky notes with messages, author name, and doodles
+- Random pastel colors and handwriting fonts for each note
+- Two views: Board (scattered layout) and Card (vertical list)
+- Real-time multi-user sync via JSONBin (every 15 seconds)
+- Edit and delete your own notes
+- Doodle canvas with color and brush-size picker
+- Emoji picker
+- Confetti animation on pin
+- Sync status indicator
+- Responsive layout (mobile-friendly)
 
 ## Architecture
 
@@ -60,7 +92,6 @@ Multiple people can write farewell messages at the same time. Here is how the ap
 ### Known Limitations
 
 - **Last-write-wins race window:** JSONBin does not support atomic read-modify-write. If two users save within the same ~200ms network round-trip, the second PUT may overwrite the first user's note. The ID-based merge minimizes this (it correctly merges whenever the fetches don't overlap), but it cannot eliminate it entirely without server-side locking.
-- **Append-only:** Notes cannot be edited or deleted through the UI, which simplifies the concurrency model — there are no update conflicts, only potential insert-vs-insert races.
 - **`Date.now()` IDs:** Two notes created within the same millisecond on different machines would collide. In practice this is extremely unlikely for a farewell card with human-speed input.
 
 ## Security
@@ -69,7 +100,7 @@ Multiple people can write farewell messages at the same time. Here is how the ap
 |---------|------------|
 | **API keys in source** | Moved to git-ignored `config.js`; template committed as `config.example.js` |
 | **XSS via message/author** | All user text is escaped with `escapeHtml()` (DOM-based, not regex) before rendering |
-| **XSS via image src** | Doodle/photo `src` attributes are validated against a strict `data:image/*;base64,...` regex; anything else is stripped |
+| **XSS via image src** | Doodle `src` attributes are validated against a strict `data:image/*;base64,...` regex; anything else is stripped |
 | **Style injection** | Rotation values are cast to `Number()` before interpolation into style attributes |
 | **innerHTML in attachments** | Replaced with DOM API (`createElement`/`appendChild`) to avoid injection in the compose panel |
 | **Client-side key exposure** | Documented as an inherent trade-off of a serverless static app (see note above) |
@@ -80,7 +111,7 @@ Multiple people can write farewell messages at the same time. Here is how the ap
 
 1. Push this repo to GitHub.
 2. Import the repo in [Vercel](https://vercel.com).
-3. In your Vercel project, go to **Settings → Environment Variables** and add:
+3. In your Vercel project, go to **Settings > Environment Variables** and add:
    - `JSONBIN_BIN_ID` — your JSONBin bin ID
    - `JSONBIN_API_KEY` — your JSONBin X-Access-Key
 4. Deploy (or redeploy). Vercel runs `build.js`, which generates `config.js` from the env vars.
@@ -95,13 +126,13 @@ You need `config.js` to be present on the server. Either:
 
 ## File Details
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `index.html` | ~80 | HTML structure, links to CSS/JS |
-| `style.css` | ~170 | All styles including responsive layout |
-| `app.js` | ~250 | All application logic |
-| `config.js` | ~10 | API keys (git-ignored, auto-generated on Vercel) |
-| `config.example.js` | ~10 | API key template (committed) |
-| `build.js` | ~25 | Generates config.js from environment variables |
-| `package.json` | ~7 | Build script definition for Vercel |
-| `vercel.json` | ~4 | Vercel build command and output directory |
+| File | Purpose |
+|------|---------|
+| `index.html` | HTML structure, links to CSS/JS |
+| `style.css` | All styles including responsive layout |
+| `app.js` | All application logic |
+| `config.js` | API keys (git-ignored, auto-generated on Vercel) |
+| `config.example.js` | API key template (committed) |
+| `build.js` | Generates config.js from environment variables |
+| `package.json` | Build script definition for Vercel |
+| `vercel.json` | Vercel build command and output directory |

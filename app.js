@@ -18,7 +18,7 @@ const BRUSH_SIZES = [2,4,7];
 
 let notes = [];
 let currentView = 'board';
-let currentDoodle = null, currentPhoto = null;
+let currentDoodle = null;
 let doodleDrawing = false, doodleColor = '#333333', doodleBrushSize = 3, doodleLastPos = null;
 let isSaving = false;
 
@@ -55,7 +55,7 @@ function isConfigured() {
 async function loadNotes() {
   if (!isConfigured()) {
     hideLoader();
-    notes = [{id:1,author:"The Team",message:"We'll miss you so much, Eveline! \u{1F49B}\nYou made every day brighter.",colorIdx:0,fontIdx:0,rotation:-2,doodle:null,photo:null}];
+    notes = [{id:1,author:"The Team",message:"We'll miss you so much, {{RECIPIENT_NAME}}! \u{1F49B}\nYou made every day brighter.",colorIdx:0,fontIdx:0,rotation:-2,doodle:null}];
     renderNotes();
     return;
   }
@@ -238,14 +238,6 @@ function toggleEmoji(){
   document.getElementById('emojiToggle').classList.toggle('emoji-active');
 }
 
-// ─── Photo ───
-async function handlePhoto(e){
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=async ev=>{ currentPhoto=await compressImage(ev.target.result,300,0.6); renderAttachments(); };
-  r.readAsDataURL(f);
-}
-function removePhoto(){ currentPhoto=null; document.getElementById('photoInput').value=''; renderAttachments(); }
 function removeDoodle(){ currentDoodle=null; renderAttachments(); }
 function renderAttachments(){
   const c=document.getElementById('attachments');
@@ -261,20 +253,6 @@ function renderAttachments(){
     btn.className = 'remove-attachment';
     btn.textContent = '\u2715';
     btn.onclick = removeDoodle;
-    wrapper.appendChild(img);
-    wrapper.appendChild(btn);
-    c.appendChild(wrapper);
-  }
-  if(currentPhoto) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'attachment-preview';
-    const img = document.createElement('img');
-    img.src = currentPhoto;
-    img.alt = 'photo';
-    const btn = document.createElement('button');
-    btn.className = 'remove-attachment';
-    btn.textContent = '\u2715';
-    btn.onclick = removePhoto;
     wrapper.appendChild(img);
     wrapper.appendChild(btn);
     c.appendChild(wrapper);
@@ -335,7 +313,7 @@ async function pinNote(){
   const ae=document.getElementById('authorInput'),me=document.getElementById('messageInput');
   const a=ae.value.trim(),m=me.value.trim();
   if(!a||!m) return;
-  const newNote = {id:Date.now(),author:a,message:m,doodle:currentDoodle,photo:currentPhoto,
+  const newNote = {id:Date.now(),author:a,message:m,doodle:currentDoodle,
     colorIdx:Math.floor(Math.random()*STICKY_COLORS.length),
     fontIdx:Math.floor(Math.random()*FONTS.length),
     rotation:(Math.random()-0.5)*6};
@@ -344,8 +322,7 @@ async function pinNote(){
   localStorage.setItem('myNoteIds', JSON.stringify([...myNoteIds]));
   // Optimistically add to local view
   notes.push(newNote);
-  ae.value='';me.value='';currentDoodle=null;currentPhoto=null;
-  document.getElementById('photoInput').value='';
+  ae.value='';me.value='';currentDoodle=null;
   renderAttachments();validateForm();renderNotes();fireConfetti();
   // Save with merge to avoid overwriting others
   await saveNotes(newNote);
@@ -359,9 +336,7 @@ function stickyHTML(n,d){
   let media='';
   // Validate image sources to prevent XSS via crafted src attributes
   const safeDoodle = sanitizeImageSrc(n.doodle);
-  const safePhoto = sanitizeImageSrc(n.photo);
   if(safeDoodle) media+=`<img src="${safeDoodle}" alt="doodle">`;
-  if(safePhoto) media+=`<img class="photo" src="${safePhoto}" alt="photo">`;
   const safeMsg = escapeHtml(n.message);
   const safeAuthor = escapeHtml(n.author);
   // Sanitize rotation and id to numbers to prevent style/attribute injection
