@@ -22,6 +22,10 @@ let currentDoodle = null, currentPhoto = null;
 let doodleDrawing = false, doodleColor = '#333333', doodleBrushSize = 3, doodleLastPos = null;
 let isSaving = false;
 
+// Track which note IDs belong to this browser session (persists across refreshes)
+let myNoteIds = new Set(JSON.parse(localStorage.getItem('myNoteIds') || '[]'));
+let editingNoteId = null;
+
 // ─── Sanitization Helpers ───
 
 /** Escape HTML special characters to prevent XSS */
@@ -70,36 +74,83 @@ async function loadNotes() {
   hideLoader();
 }
 
-async function saveNotes(newNote) {
-  if (!isConfigured()||isSaving) return;
+// Generic sync helper: fetches latest, applies transform, PUTs result back.
+// transform receives the server notes array and must return the new notes array.
+async function syncNotes(transform) {
+  if (!isConfigured() || isSaving) return;
   isSaving = true; setSyncStatus('saving');
   try {
-    // Fetch latest from server first to avoid overwriting others' notes
     const getRes = await fetch('https://api.jsonbin.io/v3/b/'+JSONBIN_BIN_ID+'/latest',{headers:{'X-Access-Key':JSONBIN_API_KEY}});
-    if (getRes.ok) {
-      const data = await getRes.json();
-      const serverNotes = data.record.notes || [];
-      // ID-based merge: build a set of all known IDs, then combine without duplicates
-      const idSet = new Set(serverNotes.map(n => n.id));
-      if (newNote && !idSet.has(newNote.id)) {
-        serverNotes.push(newNote);
-      }
-      notes = serverNotes;
-      renderNotes();
-    }
-    // Now save the merged result
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+JSONBIN_BIN_ID,{
+    if (!getRes.ok) throw new Error('HTTP '+getRes.status);
+    const data = await getRes.json();
+    const updated = transform(data.record.notes || []);
+    const putRes = await fetch('https://api.jsonbin.io/v3/b/'+JSONBIN_BIN_ID,{
       method:'PUT',
       headers:{'Content-Type':'application/json','X-Access-Key':JSONBIN_API_KEY},
-      body:JSON.stringify({notes})
+      body:JSON.stringify({notes:updated})
     });
-    if (!res.ok) throw new Error('HTTP '+res.status);
+    if (!putRes.ok) throw new Error('HTTP '+putRes.status);
+    notes = updated;
+    renderNotes();
     setSyncStatus('synced');
   } catch(e) {
-    console.error('Save error:',e);
+    console.error('Sync error:',e);
     setSyncStatus('error');
   }
   isSaving = false;
+}
+
+async function saveNotes(newNote) {
+  await syncNotes(serverNotes => {
+    const idSet = new Set(serverNotes.map(n => n.id));
+    if (newNote && !idSet.has(newNote.id)) serverNotes.push(newNote);
+    return serverNotes;
+  });
+}
+
+async function deleteNote(id) {
+  if (isSaving) { alert('Still saving — please try again in a moment.'); return; }
+  if (!confirm('Delete your note? This cannot be undone.')) return;
+  // Optimistic local removal
+  notes = notes.filter(n => n.id !== id);
+  myNoteIds.delete(id);
+  localStorage.setItem('myNoteIds', JSON.stringify([...myNoteIds]));
+  renderNotes();
+  await syncNotes(serverNotes => serverNotes.filter(n => n.id !== id));
+}
+
+function openEdit(id) {
+  if (isSaving) { alert('Still saving — please try again in a moment.'); return; }
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  editingNoteId = id;
+  document.getElementById('editInput').value = note.message;
+  document.getElementById('saveEditBtn').disabled = false;
+  document.getElementById('editOverlay').classList.remove('hidden');
+}
+
+function closeEdit() {
+  editingNoteId = null;
+  document.getElementById('editOverlay').classList.add('hidden');
+}
+
+function validateEditForm() {
+  document.getElementById('saveEditBtn').disabled =
+    !document.getElementById('editInput').value.trim();
+}
+
+async function saveEdit() {
+  const newMsg = document.getElementById('editInput').value.trim();
+  if (!newMsg || !editingNoteId) return;
+  const id = editingNoteId;
+  // Optimistic local update
+  const note = notes.find(n => n.id === id);
+  if (note) note.message = newMsg;
+  renderNotes();
+  closeEdit();
+  await syncNotes(serverNotes =>
+    serverNotes.map(n => n.id === id ? {...n, message: newMsg} : n)
+  );
 }
 
 async function refreshNotes() {
@@ -114,7 +165,8 @@ async function refreshNotes() {
     const freshIds = new Set(fresh.map(n => n.id));
     const hasChanges = fresh.length !== notes.length
       || fresh.some(n => !currentIds.has(n.id))
-      || notes.some(n => !freshIds.has(n.id));
+      || notes.some(n => !freshIds.has(n.id))
+      || fresh.some(n => { const l = notes.find(x => x.id === n.id); return l && l.message !== n.message; });
     if (hasChanges) { notes = fresh; renderNotes(); }
   } catch(e) {}
 }
@@ -287,6 +339,9 @@ async function pinNote(){
     colorIdx:Math.floor(Math.random()*STICKY_COLORS.length),
     fontIdx:Math.floor(Math.random()*FONTS.length),
     rotation:(Math.random()-0.5)*6};
+  // Remember this note belongs to us so we can edit/delete it later
+  myNoteIds.add(newNote.id);
+  localStorage.setItem('myNoteIds', JSON.stringify([...myNoteIds]));
   // Optimistically add to local view
   notes.push(newNote);
   ae.value='';me.value='';currentDoodle=null;currentPhoto=null;
@@ -309,11 +364,19 @@ function stickyHTML(n,d){
   if(safePhoto) media+=`<img class="photo" src="${safePhoto}" alt="photo">`;
   const safeMsg = escapeHtml(n.message);
   const safeAuthor = escapeHtml(n.author);
-  // Sanitize rotation to a number to prevent style injection
+  // Sanitize rotation and id to numbers to prevent style/attribute injection
   const safeRotation = Number(r) || 0;
+  const safeId = Number(n.id);
+  // Show edit/delete controls only for notes pinned in this browser session
+  const actions = myNoteIds.has(n.id)
+    ? `<div class="note-actions">
+        <button class="note-action-btn edit-btn" onclick="openEdit(${safeId})" title="Edit your note">✏️</button>
+        <button class="note-action-btn delete-btn" onclick="deleteNote(${safeId})" title="Delete your note">🗑️</button>
+       </div>`
+    : '';
   return `<div class="sticky-note" style="background:${c.bg};border-bottom:3px solid ${c.border};box-shadow:3px 4px 12px ${c.shadow},0 1px 3px rgba(0,0,0,0.08);transform:rotate(${safeRotation}deg);animation:float-in 0.5s ${d}s ease-out both;">
     ${pinSVG(c.border)}<div class="message" style="font-family:${f}">${safeMsg}</div>${media}
-    <div class="author">\u2014 ${safeAuthor}</div></div>`;
+    <div class="author">\u2014 ${safeAuthor}</div>${actions}</div>`;
 }
 
 function getPositions(cnt){
@@ -329,6 +392,19 @@ function renderNotes(){
   be.innerHTML=notes.map((n,i)=>{const p=pos[i];return `<div class="note-wrapper" style="left:${p.left}px;top:${p.top}px;z-index:${p.zIndex}">${stickyHTML(n,i*0.08)}</div>`;}).join('');
   document.getElementById('cardNotes').innerHTML=notes.map((n,i)=>`<div style="animation:float-in 0.4s ${i*0.1}s ease-out both">${stickyHTML(n,i*0.1)}</div>`).join('');
 }
+
+// ─── Admin ───
+// Run this in the browser console to wipe the entire board (you only, as creator).
+// Example: resetBoard()
+window.resetBoard = async function() {
+  if (!confirm('ADMIN: Permanently delete ALL notes from the board?')) return;
+  if (!confirm('Are you absolutely sure? There is no undo.')) return;
+  if (!isConfigured()) { console.error('JSONBin not configured.'); return; }
+  await syncNotes(() => []);
+  myNoteIds = new Set();
+  localStorage.removeItem('myNoteIds');
+  console.log('%c Board cleared successfully. ', 'background:#43A047;color:white;font-size:14px;padding:4px 8px;border-radius:4px;');
+};
 
 // ─── Confetti ───
 function fireConfetti(){
