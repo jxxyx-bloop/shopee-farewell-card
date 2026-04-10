@@ -21,12 +21,15 @@ A collaborative farewell card where the whole team can pin sticky-note messages,
 index.html           HTML structure only — no inline CSS or JS
 style.css            All styles (layout, animations, responsive breakpoints)
 app.js               Application logic (storage, rendering, UI interactions)
-config.js            API keys (git-ignored, not committed)
+config.js            API keys (git-ignored, auto-generated on Vercel)
 config.example.js    Template for config.js (committed, no real keys)
+build.js             Build script — generates config.js from env vars
+package.json         Defines the build script for Vercel
+vercel.json          Vercel build & output configuration
 .gitignore           Excludes config.js from version control
 ```
 
-This is a **purely static** client-side application — no server, no build step. It talks directly to the [JSONBin.io](https://jsonbin.io) REST API for storage.
+This is a **static** client-side application that talks directly to the [JSONBin.io](https://jsonbin.io) REST API for storage. The only build step is a small script that generates `config.js` from environment variables at deploy time.
 
 ### Why a separate `config.js`?
 
@@ -63,7 +66,7 @@ Multiple people can write farewell messages at the same time. Here is how the ap
 ## Security
 
 | Concern | Mitigation |
-|---------|-----------|
+|---------|------------|
 | **API keys in source** | Moved to git-ignored `config.js`; template committed as `config.example.js` |
 | **XSS via message/author** | All user text is escaped with `escapeHtml()` (DOM-based, not regex) before rendering |
 | **XSS via image src** | Doodle/photo `src` attributes are validated against a strict `data:image/*;base64,...` regex; anything else is stripped |
@@ -73,13 +76,22 @@ Multiple people can write farewell messages at the same time. Here is how the ap
 
 ## Deployment
 
-This is a static site — deploy it anywhere:
+### Vercel (recommended)
 
-- **GitHub Pages:** push to a branch, enable Pages in repo settings
-- **Netlify / Vercel:** drag and drop the folder
-- **Any web server:** just serve the files
+1. Push this repo to GitHub.
+2. Import the repo in [Vercel](https://vercel.com).
+3. In your Vercel project, go to **Settings → Environment Variables** and add:
+   - `JSONBIN_BIN_ID` — your JSONBin bin ID
+   - `JSONBIN_API_KEY` — your JSONBin X-Access-Key
+4. Deploy (or redeploy). Vercel runs `build.js`, which generates `config.js` from the env vars.
 
-Make sure `config.js` is present on the deployed server (upload it manually or set it via a deploy script — just don't commit it to git).
+> `config.js` is git-ignored so it never appears in your repo. Vercel generates it fresh on every build from the environment variables you set in the dashboard.
+
+### Other hosts (GitHub Pages, Netlify, any static server)
+
+You need `config.js` to be present on the server. Either:
+- Upload it manually alongside the other files, or
+- Set up a similar build step that generates it from environment variables.
 
 ## File Details
 
@@ -88,5 +100,8 @@ Make sure `config.js` is present on the deployed server (upload it manually or s
 | `index.html` | ~80 | HTML structure, links to CSS/JS |
 | `style.css` | ~170 | All styles including responsive layout |
 | `app.js` | ~250 | All application logic |
-| `config.js` | ~10 | API keys (git-ignored) |
+| `config.js` | ~10 | API keys (git-ignored, auto-generated on Vercel) |
 | `config.example.js` | ~10 | API key template (committed) |
+| `build.js` | ~25 | Generates config.js from environment variables |
+| `package.json` | ~7 | Build script definition for Vercel |
+| `vercel.json` | ~4 | Vercel build command and output directory |
