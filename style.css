@@ -160,6 +160,57 @@ body::before {
 .save-doodle-btn { margin-top: 12px; width: 100%; padding: 10px 0; background: #4CAF50; color: white; border: none; border-radius: 8px; font-family: 'Caveat', cursive; font-size: 20px; cursor: pointer; font-weight: 700; }
 .save-doodle-btn:hover { background: #43A047; }
 
+/* Note edit/delete action buttons — appear on hover, only for the author */
+.note-actions {
+  position: absolute; bottom: 8px; right: 6px;
+  display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s; pointer-events: none;
+}
+.sticky-note:hover .note-actions { opacity: 1; pointer-events: auto; }
+.note-action-btn {
+  width: 26px; height: 26px; border-radius: 50%; border: none; padding: 0;
+  cursor: pointer; font-size: 13px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.12); transition: background 0.2s;
+}
+.note-action-btn:hover { background: rgba(0,0,0,0.26); }
+.note-action-btn.delete-btn:hover { background: rgba(229,57,53,0.85); }
+
+/* Edit modal */
+.edit-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+}
+.edit-panel {
+  background: white; border-radius: 12px; padding: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2); max-width: 420px; width: 100%;
+}
+.edit-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+}
+.edit-header span { font-family: 'Caveat', cursive; font-size: 22px; font-weight: 700; color: #444; }
+.edit-header button { background: none; border: none; font-size: 20px; cursor: pointer; color: #888; }
+.edit-header button:hover { color: #333; }
+.edit-panel textarea {
+  width: 100%; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px;
+  font-family: 'Patrick Hand', cursive; font-size: 16px; outline: none; resize: vertical;
+  transition: border-color 0.2s; min-height: 120px;
+}
+.edit-panel textarea:focus { border-color: #90CAF9; }
+.edit-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+.cancel-edit-btn {
+  padding: 8px 18px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 8px;
+  font-family: 'Patrick Hand', cursive; font-size: 15px; cursor: pointer; transition: background 0.2s;
+}
+.cancel-edit-btn:hover { background: #eee; }
+.save-edit-btn {
+  padding: 9px 20px; background: linear-gradient(135deg, #42A5F5, #1E88E5);
+  color: white; border: none; border-radius: 8px;
+  font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; cursor: pointer;
+  transition: opacity 0.2s;
+}
+.save-edit-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.save-edit-btn:not(:disabled):hover { opacity: 0.88; }
+
 .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
 .confetti-piece { position: absolute; top: -20px; }
 .footer { text-align: center; padding: 20px 0 32px; position: relative; z-index: 5; }

@@ -75,6 +75,20 @@
   </div>
 </div>
 
+<div class="edit-overlay hidden" id="editOverlay">
+  <div class="edit-panel">
+    <div class="edit-header">
+      <span>✏️ Edit your note</span>
+      <button onclick="closeEdit()">✕</button>
+    </div>
+    <textarea id="editInput" rows="6" placeholder="Edit your message..." oninput="validateEditForm()"></textarea>
+    <div class="edit-actions">
+      <button class="cancel-edit-btn" onclick="closeEdit()">Cancel</button>
+      <button class="save-edit-btn" id="saveEditBtn" onclick="saveEdit()">Save changes ✓</button>
+    </div>
+  </div>
+</div>
+
 <div class="confetti-container hidden" id="confetti"></div>
 <div class="footer"><p>Made with love 💛 • Pin your note above!</p></div>
 
