@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌸 Farewell, Eveline!</title>
+<title>🌸 Farewell, {{RECIPIENT_NAME}}!</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Indie+Flower&family=Patrick+Hand&family=Shadows+Into+Light&display=swap" rel="stylesheet">
@@ -22,7 +22,7 @@
 </div>
 
 <div class="header">
-  <h1>🌸 Farewell, Eveline! 🌸</h1>
+  <h1>🌸 Farewell, {{RECIPIENT_NAME}}! 🌸</h1>
   <p class="subtitle">A board full of love from your amazing team</p>
   <div class="view-toggle">
     <button class="view-btn active" id="boardBtn" onclick="setView('board')">📋 Board</button>
@@ -34,15 +34,13 @@
 <div class="main">
   <div class="compose">
     <div class="compose-inner">
-      <h3>✍️ Leave a note for Eveline</h3>
+      <h3>✍️ Leave a note for {{RECIPIENT_NAME}}</h3>
       <input type="text" id="authorInput" placeholder="Your name">
       <textarea id="messageInput" rows="4" placeholder="Write your farewell message... 💛"></textarea>
       <div class="attachments" id="attachments"></div>
       <div class="actions">
         <button class="action-btn" id="emojiToggle" onclick="toggleEmoji()">😊</button>
         <button class="action-btn" onclick="openDoodle()">🎨 Doodle</button>
-        <button class="action-btn" onclick="document.getElementById('photoInput').click()">📷 Photo</button>
-        <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhoto(event)">
         <button class="pin-btn" id="pinBtn" onclick="pinNote()" disabled>Pin it! 📌</button>
       </div>
       <div class="emoji-picker hidden" id="emojiPicker"></div>
@@ -52,7 +50,7 @@
   <div class="board-area" id="boardView"></div>
   <div class="card-area hidden" id="cardView">
     <div class="card-container">
-      <div class="card-header"><span>💌</span><h2>Messages for Eveline</h2></div>
+      <div class="card-header"><span>💌</span><h2>Messages for {{RECIPIENT_NAME}}</h2></div>
       <div class="card-notes" id="cardNotes"></div>
     </div>
   </div>
