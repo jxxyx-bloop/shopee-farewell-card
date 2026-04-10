@@ -1,0 +1,184 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #5D4037 0%, #4E342E 40%, #3E2723 100%);
+  font-family: 'Patrick Hand', cursive;
+  overflow-x: hidden;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none; opacity: 0.4; z-index: 0;
+}
+
+@keyframes float-in {
+  from { opacity: 0; transform: translateY(30px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes confetti-fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* Sync Status */
+.sync-status {
+  position: fixed; top: 12px; right: 16px; z-index: 100;
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+  padding: 6px 14px; border-radius: 20px;
+  font-size: 13px; color: rgba(255,249,196,0.8);
+}
+.sync-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #66BB6A;
+}
+.sync-dot.saving { background: #FFA726; animation: pulse 0.8s infinite; }
+.sync-dot.error { background: #E53935; }
+
+/* Header */
+.header { position: relative; z-index: 10; padding: 32px 24px 20px; text-align: center; }
+.header h1 {
+  font-family: 'Caveat', cursive; font-size: clamp(36px, 6vw, 56px);
+  color: #FFF9C4; text-shadow: 2px 3px 6px rgba(0,0,0,0.4); letter-spacing: 1px;
+}
+.header .subtitle {
+  font-family: 'Shadows Into Light', cursive; color: rgba(255,249,196,0.7);
+  font-size: clamp(16px, 2.5vw, 22px); margin-top: 6px; letter-spacing: 2px;
+}
+.view-toggle { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+.view-btn {
+  padding: 6px 18px; background: transparent; color: #FFF9C4;
+  border: 1px solid rgba(255,249,196,0.3); border-radius: 20px;
+  font-family: 'Patrick Hand', cursive; font-size: 15px; cursor: pointer; transition: all 0.2s;
+}
+.view-btn.active { background: rgba(255,249,196,0.25); }
+.note-count { margin-top: 10px; color: rgba(255,249,196,0.5); font-size: 14px; }
+
+/* Layout */
+.main {
+  position: relative; z-index: 5; max-width: 1200px; margin: 0 auto;
+  padding: 0 24px 40px; display: flex; gap: 32px; flex-wrap: wrap;
+  justify-content: center; align-items: flex-start;
+}
+
+/* Compose */
+.compose { position: sticky; top: 20px; z-index: 20; animation: float-in 0.6s ease-out; }
+.compose-inner {
+  background: rgba(255,255,255,0.95); border-radius: 16px; padding: 24px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.1); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.6); max-width: 440px; width: 100%;
+}
+.compose-inner h3 { font-family: 'Caveat', cursive; font-size: 26px; color: #444; margin-bottom: 16px; }
+.compose-inner input[type="text"], .compose-inner textarea {
+  width: 100%; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px;
+  font-family: 'Patrick Hand', cursive; font-size: 16px; outline: none;
+  transition: border-color 0.2s; background: white;
+}
+.compose-inner input[type="text"] { margin-bottom: 10px; }
+.compose-inner textarea { resize: vertical; }
+.compose-inner input:focus, .compose-inner textarea:focus { border-color: #90CAF9; }
+
+.attachments { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.attachment-preview { position: relative; display: inline-block; }
+.attachment-preview img { height: 60px; border-radius: 6px; border: 1px solid #ddd; object-fit: cover; }
+.remove-attachment {
+  position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%;
+  background: #E53935; color: white; border: none; cursor: pointer; font-size: 12px; line-height: 20px; padding: 0;
+}
+
+.actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+.action-btn {
+  padding: 8px 14px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 8px;
+  cursor: pointer; font-family: 'Patrick Hand', cursive; font-size: 14px; transition: all 0.2s;
+}
+.action-btn:hover { background: #eee; }
+.action-btn.emoji-active { background: #FFF9C4; border: 2px solid #F9E547; }
+
+.pin-btn {
+  margin-left: auto; padding: 10px 24px;
+  background: linear-gradient(135deg, #66BB6A, #43A047);
+  color: white; border: none; border-radius: 10px;
+  font-family: 'Caveat', cursive; font-size: 20px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 2px 8px rgba(67,160,71,0.3); transition: all 0.2s;
+}
+.pin-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+.pin-btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(67,160,71,0.4); }
+
+.emoji-picker {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; padding: 10px;
+  background: #FFFDE7; border-radius: 10px; border: 1px solid #F9E547;
+}
+.emoji-btn { width: 36px; height: 36px; background: none; border: none; font-size: 22px; cursor: pointer; border-radius: 6px; }
+.emoji-btn:hover { background: rgba(0,0,0,0.05); }
+
+/* Sticky Note */
+.sticky-note {
+  border-radius: 4px; padding: 28px 18px 18px; width: 220px; min-height: 140px;
+  position: relative; transition: transform 0.25s ease, box-shadow 0.25s ease; cursor: default;
+}
+.sticky-note:hover { transform: rotate(0deg) scale(1.04) !important; z-index: 50 !important; }
+.sticky-note .message { font-size: 15px; line-height: 1.5; color: #333; word-break: break-word; white-space: pre-wrap; }
+.sticky-note img { width: 100%; margin-top: 8px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.06); }
+.sticky-note img.photo { object-fit: cover; max-height: 150px; }
+.sticky-note .author { margin-top: 12px; font-family: 'Patrick Hand', cursive; font-size: 13px; color: #888; text-align: right; font-style: italic; }
+.pin { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); z-index: 3; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
+
+.board-area { position: relative; flex: 1 1 500px; min-height: 600px; }
+.board-area .note-wrapper { position: absolute; }
+
+.card-area { flex: 1 1 500px; display: flex; flex-direction: column; gap: 20px; align-items: center; }
+.card-container {
+  background: rgba(255,255,255,0.07); border-radius: 20px; padding: 32px;
+  max-width: 600px; width: 100%; border: 2px solid rgba(255,249,196,0.15); backdrop-filter: blur(4px);
+}
+.card-container .card-header { text-align: center; margin-bottom: 24px; }
+.card-container .card-header span { font-size: 48px; }
+.card-container .card-header h2 { font-family: 'Caveat', cursive; color: #FFF9C4; font-size: 32px; margin-top: 8px; }
+.card-notes { display: flex; flex-direction: column; gap: 16px; }
+.card-notes .sticky-note { width: auto; }
+
+/* Doodle */
+.doodle-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+}
+.doodle-panel { background: white; border-radius: 12px; padding: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); max-width: 500px; width: 100%; }
+.doodle-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.doodle-header span { font-family: 'Caveat', cursive; font-size: 20px; font-weight: 700; }
+.doodle-header button { background: none; border: none; font-size: 20px; cursor: pointer; }
+.doodle-canvas { width: 100%; height: 200px; border: 2px dashed #ccc; border-radius: 8px; cursor: crosshair; touch-action: none; background: repeating-conic-gradient(#f5f5f5 0% 25%, transparent 0% 50%) 50% / 16px 16px; }
+.doodle-tools { display: flex; gap: 6px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+.color-dot { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; padding: 0; border: 2px solid #ddd; }
+.color-dot.active { border: 3px solid #333; }
+.size-dot { width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; background: transparent; border: 2px solid transparent; }
+.size-dot.active { background: #eee; border: 2px solid #999; }
+.size-dot span { border-radius: 50%; background: #333; display: block; }
+.clear-btn { margin-left: auto; background: #f5f5f5; border: 1px solid #ddd; border-radius: 6px; padding: 4px 12px; cursor: pointer; font-family: 'Patrick Hand', cursive; font-size: 14px; }
+.save-doodle-btn { margin-top: 12px; width: 100%; padding: 10px 0; background: #4CAF50; color: white; border: none; border-radius: 8px; font-family: 'Caveat', cursive; font-size: 20px; cursor: pointer; font-weight: 700; }
+.save-doodle-btn:hover { background: #43A047; }
+
+.confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden; }
+.confetti-piece { position: absolute; top: -20px; }
+.footer { text-align: center; padding: 20px 0 32px; position: relative; z-index: 5; }
+.footer p { font-family: 'Shadows Into Light', cursive; color: rgba(255,249,196,0.4); font-size: 14px; }
+.hidden { display: none !important; }
+
+.loading-overlay {
+  position: fixed; inset: 0; background: linear-gradient(145deg, #5D4037, #3E2723);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000;
+  transition: opacity 0.5s;
+}
+.loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+.spinner { width: 48px; height: 48px; border: 4px solid rgba(255,249,196,0.2); border-top-color: #FFF9C4; border-radius: 50%; animation: spin 0.8s linear infinite; }
+.loading-text { font-family: 'Caveat', cursive; color: #FFF9C4; font-size: 22px; margin-top: 16px; }
+
+@media (max-width: 768px) {
+  .main { flex-direction: column; align-items: center; }
+  .compose { position: static; width: 100%; }
+  .compose-inner { max-width: 100%; }
+  .board-area { width: 100%; }
+  .sticky-note { width: 180px !important; min-height: 120px; }
+}
