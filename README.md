@@ -65,12 +65,7 @@ This is a **static** client-side application that talks directly to the [JSONBin
 
 ### Why a separate `config.js`?
 
-The original code had API keys hardcoded in `index.html`, which meant they were committed to git history and visible in the page source. Separating them into a git-ignored file means:
-
-- Keys are **not in version control** — new contributors copy the example and add their own.
-- If you rotate your JSONBin API key, you only edit one file.
-
-> **Note on client-side keys:** Because this is a static site with no backend, the API key is still visible to anyone who opens browser DevTools on the deployed page. This is an inherent limitation of client-only apps. For this use case (a team farewell card with a short lifespan), the risk is acceptable. If stronger protection is needed, you would need a backend proxy that holds the key server-side.
+The `config.js` file holds API credentials and is **git-ignored** to keep keys out of version control. This prevents accidental commits to git history. For more details on how API keys are protected, see the [Security](#security) section below.
 
 ## How Multi-User Concurrency Works
 
@@ -98,12 +93,12 @@ Multiple people can write farewell messages at the same time. Here is how the ap
 
 | Concern | Mitigation |
 |---------|------------|
-| **API keys in source** | Moved to git-ignored `config.js`; template committed as `config.example.js` |
+| **API keys in source control** | API credentials are stored in `config.js`, which is git-ignored. This prevents keys from being committed to git history or exposed in the repository. Contributors copy `config.example.js` and add their own credentials locally. |
+| **Client-side key visibility** | Because this is a static app with no backend, the API key is visible in browser DevTools on the deployed page. This is an inherent limitation of serverless sites. For a team farewell card with a short lifespan, this risk is acceptable. For sensitive use cases, a backend proxy holding the key server-side would be needed. |
 | **XSS via message/author** | All user text is escaped with `escapeHtml()` (DOM-based, not regex) before rendering |
 | **XSS via image src** | Doodle `src` attributes are validated against a strict `data:image/*;base64,...` regex; anything else is stripped |
 | **Style injection** | Rotation values are cast to `Number()` before interpolation into style attributes |
 | **innerHTML in attachments** | Replaced with DOM API (`createElement`/`appendChild`) to avoid injection in the compose panel |
-| **Client-side key exposure** | Documented as an inherent trade-off of a serverless static app (see note above) |
 
 ## Deployment
 
@@ -116,7 +111,7 @@ Multiple people can write farewell messages at the same time. Here is how the ap
    - `JSONBIN_API_KEY` — your JSONBin X-Access-Key
 4. Deploy (or redeploy). Vercel runs `build.js`, which generates `config.js` from the env vars.
 
-> `config.js` is git-ignored so it never appears in your repo. Vercel generates it fresh on every build from the environment variables you set in the dashboard.
+> **Security note:** `config.js` is git-ignored and only generated at deploy time from environment variables. Your API keys never appear in the repository or git history, keeping them secure and separate from your source code.
 
 ### Other hosts (GitHub Pages, Netlify, any static server)
 
