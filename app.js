@@ -6,20 +6,15 @@ const STICKY_COLORS = [
   {bg:"#F8BBD0",border:"#EC407A",shadow:"rgba(236,64,122,0.3)"},
   {bg:"#C8E6C9",border:"#66BB6A",shadow:"rgba(102,187,106,0.3)"},
   {bg:"#BBDEFB",border:"#42A5F5",shadow:"rgba(66,165,245,0.3)"},
-  {bg:"#FFE0B2",border:"#FFA726",shadow:"rgba(255,167,38,0.3)"},
+  {bg:"#FFE0D3",border:"#EE4D2D",shadow:"rgba(238,77,45,0.25)"},
   {bg:"#E1BEE7",border:"#AB47BC",shadow:"rgba(171,71,188,0.3)"},
-  {bg:"#B2EBF2",border:"#26C6DA",shadow:"rgba(38,198,218,0.3)"},
+  {bg:"#FFF3E0",border:"#FF7337",shadow:"rgba(255,115,55,0.25)"},
   {bg:"#FFCCBC",border:"#FF7043",shadow:"rgba(255,112,67,0.3)"},
 ];
 const EMOJIS = ["❤️","🎉","🥳","👏","🌟","💐","🫶","😢","🍀","🎊","✨","🙏","💪","🤗","🎈","🥂","💛","🦋","🌈","🫡"];
 const FONTS = ["'Caveat',cursive","'Patrick Hand',cursive","'Shadows Into Light',cursive","'Indie Flower',cursive"];
-const DOODLE_COLORS = ["#333333","#E53935","#1E88E5","#43A047","#FB8C00","#8E24AA","#00ACC1","#F06292"];
-const BRUSH_SIZES = [2,4,7];
-
 let notes = [];
 let currentView = 'board';
-let currentDoodle = null;
-let doodleDrawing = false, doodleColor = '#333333', doodleBrushSize = 3, doodleLastPos = null;
 let isSaving = false;
 
 // Track which note IDs belong to this browser session (persists across refreshes)
@@ -33,17 +28,6 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.appendChild(document.createTextNode(str));
   return div.innerHTML;
-}
-
-/** Validate that a string is a safe data URI (image/*) or empty */
-function sanitizeImageSrc(src) {
-  if (!src) return null;
-  if (typeof src !== 'string') return null;
-  // Only allow data: URIs with image MIME types
-  if (/^data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,[A-Za-z0-9+/=\s]+$/.test(src)) {
-    return src;
-  }
-  return null;
 }
 
 // ─── JSONBin Storage ───
@@ -185,22 +169,6 @@ function hideLoader() {
   setTimeout(()=>el.style.display='none',500);
 }
 
-// ─── Image Compression ───
-function compressImage(dataUrl,maxW,quality){
-  return new Promise(resolve=>{
-    const img=new Image();
-    img.onload=()=>{
-      const c=document.createElement('canvas');
-      let w=img.width,h=img.height;
-      if(w>maxW){h=(maxW/w)*h;w=maxW;}
-      c.width=w;c.height=h;
-      c.getContext('2d').drawImage(img,0,0,w,h);
-      resolve(c.toDataURL('image/jpeg',quality));
-    };
-    img.src=dataUrl;
-  });
-}
-
 // ─── Init ───
 document.addEventListener('DOMContentLoaded',()=>{
   if (!isConfigured()) {
@@ -209,7 +177,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       + 'See README.md for setup instructions.'
     );
   }
-  buildEmojiPicker(); buildDoodleTools(); initDoodleCanvas(); setupFormValidation();
+  buildEmojiPicker(); setupFormValidation();
   loadNotes();
   setInterval(refreshNotes,REFRESH_INTERVAL);
 });
@@ -238,65 +206,6 @@ function toggleEmoji(){
   document.getElementById('emojiToggle').classList.toggle('emoji-active');
 }
 
-function removeDoodle(){ currentDoodle=null; renderAttachments(); }
-function renderAttachments(){
-  const c=document.getElementById('attachments');
-  c.innerHTML='';
-  // Build attachment previews safely using DOM APIs instead of innerHTML
-  if(currentDoodle) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'attachment-preview';
-    const img = document.createElement('img');
-    img.src = currentDoodle;
-    img.alt = 'doodle';
-    const btn = document.createElement('button');
-    btn.className = 'remove-attachment';
-    btn.textContent = '\u2715';
-    btn.onclick = removeDoodle;
-    wrapper.appendChild(img);
-    wrapper.appendChild(btn);
-    c.appendChild(wrapper);
-  }
-}
-
-// ─── Doodle ───
-function buildDoodleTools(){
-  const ce=document.getElementById('doodleColors');
-  DOODLE_COLORS.forEach(c=>{
-    const b=document.createElement('button');b.className='color-dot'+(c===doodleColor?' active':'');b.style.background=c;
-    b.onclick=()=>{doodleColor=c;ce.querySelectorAll('.color-dot').forEach(d=>d.classList.toggle('active',d.style.backgroundColor===c||d.style.background===c));};
-    ce.appendChild(b);
-  });
-  const se=document.getElementById('doodleSizes');
-  BRUSH_SIZES.forEach(s=>{
-    const b=document.createElement('button');b.className='size-dot'+(s===doodleBrushSize?' active':'');
-    const d=document.createElement('span');d.style.width=s*2.5+'px';d.style.height=s*2.5+'px';
-    b.appendChild(d);
-    b.onclick=()=>{doodleBrushSize=s;se.querySelectorAll('.size-dot').forEach(x=>x.classList.remove('active'));b.classList.add('active');};
-    se.appendChild(b);
-  });
-}
-function initDoodleCanvas(){
-  const cv=document.getElementById('doodleCanvas');
-  const gp=e=>{const r=cv.getBoundingClientRect();const cx=e.touches?e.touches[0].clientX:e.clientX;const cy=e.touches?e.touches[0].clientY:e.clientY;return{x:(cx-r.left)*(cv.width/r.width),y:(cy-r.top)*(cv.height/r.height)};};
-  const st=e=>{e.preventDefault();doodleDrawing=true;doodleLastPos=gp(e);};
-  const dr=e=>{if(!doodleDrawing)return;e.preventDefault();const p=gp(e);const ctx=cv.getContext('2d');ctx.strokeStyle=doodleColor;ctx.lineWidth=doodleBrushSize;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(doodleLastPos.x,doodleLastPos.y);ctx.lineTo(p.x,p.y);ctx.stroke();doodleLastPos=p;};
-  const en=()=>{doodleDrawing=false;};
-  cv.addEventListener('mousedown',st);cv.addEventListener('mousemove',dr);cv.addEventListener('mouseup',en);cv.addEventListener('mouseleave',en);
-  cv.addEventListener('touchstart',st,{passive:false});cv.addEventListener('touchmove',dr,{passive:false});cv.addEventListener('touchend',en);
-}
-function openDoodle(){document.getElementById('doodleOverlay').classList.remove('hidden');clearDoodle();}
-function closeDoodle(){document.getElementById('doodleOverlay').classList.add('hidden');}
-function clearDoodle(){document.getElementById('doodleCanvas').getContext('2d').clearRect(0,0,560,300);}
-async function saveDoodle(){
-  const cv=document.getElementById('doodleCanvas'),ctx=cv.getContext('2d');
-  const px=ctx.getImageData(0,0,cv.width,cv.height).data;
-  if(Array.from(px).some((v,i)=>i%4===3&&v>0)){
-    currentDoodle=await compressImage(cv.toDataURL('image/png'),300,0.7);
-    renderAttachments();
-  }
-  closeDoodle();
-}
 
 // ─── Form ───
 function setupFormValidation(){
@@ -313,7 +222,7 @@ async function pinNote(){
   const ae=document.getElementById('authorInput'),me=document.getElementById('messageInput');
   const a=ae.value.trim(),m=me.value.trim();
   if(!a||!m) return;
-  const newNote = {id:Date.now(),author:a,message:m,doodle:currentDoodle,
+  const newNote = {id:Date.now(),author:a,message:m,
     colorIdx:Math.floor(Math.random()*STICKY_COLORS.length),
     fontIdx:Math.floor(Math.random()*FONTS.length),
     rotation:(Math.random()-0.5)*6};
@@ -322,8 +231,8 @@ async function pinNote(){
   localStorage.setItem('myNoteIds', JSON.stringify([...myNoteIds]));
   // Optimistically add to local view
   notes.push(newNote);
-  ae.value='';me.value='';currentDoodle=null;
-  renderAttachments();validateForm();renderNotes();fireConfetti();
+  ae.value='';me.value='';
+  validateForm();renderNotes();fireConfetti();showMascotCelebration();
   // Save with merge to avoid overwriting others
   await saveNotes(newNote);
 }
@@ -333,10 +242,6 @@ function pinSVG(color){return `<svg class="pin" width="20" height="20" viewBox="
 
 function stickyHTML(n,d){
   const c=STICKY_COLORS[n.colorIdx%STICKY_COLORS.length],f=FONTS[n.fontIdx%FONTS.length],r=n.rotation||0;
-  let media='';
-  // Validate image sources to prevent XSS via crafted src attributes
-  const safeDoodle = sanitizeImageSrc(n.doodle);
-  if(safeDoodle) media+=`<img src="${safeDoodle}" alt="doodle">`;
   const safeMsg = escapeHtml(n.message);
   const safeAuthor = escapeHtml(n.author);
   // Sanitize rotation and id to numbers to prevent style/attribute injection
@@ -350,7 +255,7 @@ function stickyHTML(n,d){
        </div>`
     : '';
   return `<div class="sticky-note" style="background:${c.bg};border-bottom:3px solid ${c.border};box-shadow:3px 4px 12px ${c.shadow},0 1px 3px rgba(0,0,0,0.08);transform:rotate(${safeRotation}deg);animation:float-in 0.5s ${d}s ease-out both;">
-    ${pinSVG(c.border)}<div class="message" style="font-family:${f}">${safeMsg}</div>${media}
+    ${pinSVG(c.border)}<div class="message" style="font-family:${f}">${safeMsg}</div>
     <div class="author">\u2014 ${safeAuthor}</div>${actions}</div>`;
 }
 
@@ -384,10 +289,22 @@ window.resetBoard = async function() {
 // ─── Confetti ───
 function fireConfetti(){
   const c=document.getElementById('confetti');c.classList.remove('hidden');
-  const cols=["#E53935","#FB8C00","#43A047","#1E88E5","#8E24AA","#F06292","#FFD600","#00BCD4"];
+  const cols=["#EE4D2D","#FF7337","#FB8C00","#43A047","#1E88E5","#8E24AA","#F06292","#FFD600"];
   let h='';
   for(let i=0;i<60;i++){const x=Math.random()*100,cl=cols[i%8],dl=Math.random()*0.5,du=1.5+Math.random()*1.5,sz=6+Math.random()*8,dr=(Math.random()-0.5)*80,ci=Math.random()>0.5;
     h+=`<div class="confetti-piece" style="left:${x}%;width:${sz}px;height:${ci?sz:sz*1.5}px;border-radius:${ci?'50%':'2px'};background:${cl};margin-left:${dr}px;animation:confetti-fall ${du}s ${dl}s ease-in forwards;"></div>`;}
   c.innerHTML=h;
   setTimeout(()=>{c.classList.add('hidden');c.innerHTML='';},3500);
+}
+
+// ─── Mascot Celebration ───
+function showMascotCelebration(){
+  const el=document.getElementById('mascotCelebrate');
+  if(!el) return;
+  el.classList.remove('hidden','fade-out');
+  clearTimeout(el._timer);
+  el._timer=setTimeout(()=>{
+    el.classList.add('fade-out');
+    setTimeout(()=>el.classList.add('hidden'),500);
+  },2000);
 }
