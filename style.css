@@ -60,13 +60,6 @@ body::before {
   box-shadow: 0 4px 20px rgba(238,77,45,0.3);
   overflow: visible;
 }
-.shopee-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(255,255,255,0.18); border-radius: 20px;
-  padding: 5px 14px 5px 8px; margin-bottom: 12px;
-  font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800;
-  color: white; letter-spacing: 0.5px;
-}
 .header h1 {
   font-family: 'Caveat', cursive; font-size: clamp(36px, 6vw, 56px);
   color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.2); letter-spacing: 1px;
@@ -86,14 +79,16 @@ body::before {
 .view-btn:not(.active):hover { background: rgba(255,255,255,0.12); }
 .note-count { margin-top: 10px; color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 600; }
 
-/* Header mascot */
+/* Header mascots */
 .header-mascot {
-  position: absolute; right: max(40px, 4vw); bottom: -42px;
+  position: absolute; bottom: -42px;
   width: clamp(90px, 10vw, 130px); z-index: 20;
   animation: mascot-float 3s ease-in-out infinite;
   filter: drop-shadow(0 6px 14px rgba(238,77,45,0.35));
-  pointer-events: none;
+  pointer-events: none; user-select: none;
 }
+.header-mascot-left  { left: max(40px, 4vw); animation-delay: 0.4s; }
+.header-mascot-right { right: max(40px, 4vw); }
 
 /* Layout */
 .main {
@@ -267,5 +262,7 @@ body::before {
   .compose-inner { max-width: 100%; }
   .board-area { width: 100%; }
   .sticky-note { width: 180px !important; min-height: 120px; }
-  .header-mascot { width: 80px; right: 8px; bottom: -32px; }
+  .header-mascot       { width: 70px; bottom: -28px; }
+  .header-mascot-left  { left: 4px; }
+  .header-mascot-right { right: 4px; }
 }
