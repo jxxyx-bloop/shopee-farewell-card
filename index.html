@@ -12,51 +12,7 @@
 <body>
 
 <div class="loading-overlay" id="loadingOverlay">
-  <!-- Shopee mascot: sparkle/excited pose -->
-  <svg class="loading-mascot" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140">
-    <!-- Sparkles -->
-    <g fill="#FFD600" opacity="0.9">
-      <polygon points="10,18 12,24 18,24 13,28 15,34 10,30 5,34 7,28 2,24 8,24" transform="scale(0.7) translate(4,2)"/>
-      <polygon points="108,10 110,16 116,16 111,20 113,26 108,22 103,26 105,20 100,16 106,16" transform="scale(0.65)"/>
-      <polygon points="100,60 101.5,64.5 106,64.5 102.5,67 104,71.5 100,69 96,71.5 97.5,67 94,64.5 98.5,64.5" transform="scale(0.8)"/>
-    </g>
-    <!-- Body/dress with S -->
-    <ellipse cx="60" cy="118" rx="22" ry="18" fill="#FF7337"/>
-    <text x="60" y="124" font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="white" text-anchor="middle">S</text>
-    <!-- Arms raised -->
-    <path d="M 38 105 Q 24 90 18 78" fill="none" stroke="#FFDBB4" stroke-width="9" stroke-linecap="round"/>
-    <circle cx="16" cy="75" r="7" fill="#FFDBB4"/>
-    <path d="M 82 105 Q 96 90 102 78" fill="none" stroke="#FFDBB4" stroke-width="9" stroke-linecap="round"/>
-    <circle cx="104" cy="75" r="7" fill="#FFDBB4"/>
-    <!-- Neck -->
-    <rect x="50" y="98" width="20" height="10" rx="5" fill="#FFDBB4"/>
-    <!-- Face -->
-    <circle cx="60" cy="76" r="30" fill="#FFDBB4"/>
-    <!-- Hair base -->
-    <ellipse cx="60" cy="54" rx="28" ry="22" fill="#EE4D2D"/>
-    <!-- Hair spikes -->
-    <ellipse cx="42" cy="44" rx="11" ry="16" fill="#EE4D2D" transform="rotate(-25,42,44)"/>
-    <ellipse cx="60" cy="38" rx="10" ry="17" fill="#D84315" transform="rotate(0,60,38)"/>
-    <ellipse cx="78" cy="44" rx="11" ry="16" fill="#EE4D2D" transform="rotate(25,78,44)"/>
-    <!-- Pink bow -->
-    <path d="M 36 50 C 26 42 28 32 38 38 C 42 40 42 48 36 50Z" fill="#FF80AB"/>
-    <path d="M 36 50 C 26 58 28 66 38 60 C 42 58 42 52 36 50Z" fill="#F50057"/>
-    <path d="M 56 50 C 66 42 64 32 54 38 C 50 40 50 48 56 50Z" fill="#FF80AB"/>
-    <path d="M 56 50 C 66 58 64 66 54 60 C 50 58 50 52 56 50Z" fill="#F50057"/>
-    <circle cx="46" cy="50" r="6" fill="#FF4081"/>
-    <!-- Eyes: wide open, excited -->
-    <circle cx="49" cy="76" r="8" fill="white"/>
-    <circle cx="71" cy="76" r="8" fill="white"/>
-    <circle cx="50" cy="76" r="6" fill="#1A1A1A"/>
-    <circle cx="72" cy="76" r="6" fill="#1A1A1A"/>
-    <circle cx="52" cy="73" r="2.5" fill="white"/>
-    <circle cx="74" cy="73" r="2.5" fill="white"/>
-    <!-- Cheeks -->
-    <ellipse cx="38" cy="84" rx="8" ry="6" fill="rgba(255,100,120,0.38)"/>
-    <ellipse cx="82" cy="84" rx="8" ry="6" fill="rgba(255,100,120,0.38)"/>
-    <!-- Big smile -->
-    <path d="M 46 90 Q 60 103 74 90" fill="none" stroke="#444" stroke-width="3" stroke-linecap="round"/>
-  </svg>
+  <img class="loading-mascot" src="assets/sophie-excited-sparkles@2x.png" alt="" draggable="false">
   <div class="spinner"></div>
   <div class="loading-text">Loading notes...</div>
 </div>
@@ -67,13 +23,6 @@
 </div>
 
 <div class="header">
-  <div class="shopee-badge">
-    <svg width="22" height="22" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-      <rect width="36" height="36" rx="8" fill="white"/>
-      <text x="18" y="27" font-family="Arial Black,sans-serif" font-size="22" font-weight="900" fill="#EE4D2D" text-anchor="middle">S</text>
-    </svg>
-    <span>Shopee</span>
-  </div>
   <h1>Farewell, {{RECIPIENT_NAME}}!</h1>
   <p class="subtitle">A board full of love from your amazing Shopee team</p>
   <div class="view-toggle">
@@ -82,50 +31,13 @@
   </div>
   <div class="note-count" id="noteCount">Loading...</div>
 
-  <!-- Header mascot: peeking from Shopee bag, waving Hi -->
-  <svg class="header-mascot" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 175" aria-hidden="true">
-    <!-- Shopping bag -->
-    <rect x="5" y="82" width="110" height="88" rx="16" fill="white" stroke="#EE4D2D" stroke-width="3"/>
-    <!-- Bag handles -->
-    <path d="M 33 82 Q 33 54 60 54 Q 87 54 87 82" fill="none" stroke="#EE4D2D" stroke-width="4.5" stroke-linecap="round"/>
-    <!-- S logo on bag -->
-    <text x="60" y="145" font-family="Arial Black,sans-serif" font-size="38" font-weight="900" fill="#EE4D2D" text-anchor="middle">S</text>
-    <!-- Neck/shoulder peeking over bag -->
-    <ellipse cx="60" cy="88" rx="24" ry="10" fill="#FFDBB4"/>
-    <!-- Face -->
-    <circle cx="60" cy="60" r="30" fill="#FFDBB4"/>
-    <!-- Hair base -->
-    <ellipse cx="60" cy="38" rx="27" ry="22" fill="#EE4D2D"/>
-    <!-- Hair spikes -->
-    <ellipse cx="40" cy="30" rx="11" ry="16" fill="#EE4D2D" transform="rotate(-28,40,30)"/>
-    <ellipse cx="60" cy="24" rx="10" ry="17" fill="#D84315"/>
-    <ellipse cx="80" cy="30" rx="11" ry="16" fill="#EE4D2D" transform="rotate(28,80,30)"/>
-    <!-- Pink bow -->
-    <path d="M 34 36 C 24 28 26 18 36 24 C 40 26 40 34 34 36Z" fill="#FF80AB"/>
-    <path d="M 34 36 C 24 44 26 52 36 46 C 40 44 40 36 34 36Z" fill="#F50057"/>
-    <path d="M 54 36 C 64 28 62 18 52 24 C 48 26 48 34 54 36Z" fill="#FF80AB"/>
-    <path d="M 54 36 C 64 44 62 52 52 46 C 48 44 48 36 54 36Z" fill="#F50057"/>
-    <circle cx="44" cy="36" r="6" fill="#FF4081"/>
-    <!-- Eyes: friendly wink -->
-    <circle cx="49" cy="60" r="7.5" fill="white"/>
-    <circle cx="71" cy="60" r="7.5" fill="white"/>
-    <circle cx="50" cy="60" r="5.5" fill="#1A1A1A"/>
-    <circle cx="72" cy="60" r="5.5" fill="#1A1A1A"/>
-    <circle cx="52" cy="57.5" r="2" fill="white"/>
-    <circle cx="74" cy="57.5" r="2" fill="white"/>
-    <!-- Cheeks -->
-    <ellipse cx="38" cy="68" rx="8" ry="5.5" fill="rgba(255,100,120,0.38)"/>
-    <ellipse cx="82" cy="68" rx="8" ry="5.5" fill="rgba(255,100,120,0.38)"/>
-    <!-- Smile -->
-    <path d="M 46 73 Q 60 83 74 73" fill="none" stroke="#444" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- Waving arm -->
-    <path d="M 88 70 Q 104 55 112 44" fill="none" stroke="#FFDBB4" stroke-width="10" stroke-linecap="round"/>
-    <circle cx="114" cy="41" r="8" fill="#FFDBB4"/>
-    <!-- Hi speech bubble -->
-    <ellipse cx="116" cy="24" rx="14" ry="10" fill="#FFF9C4" stroke="#F9E547" stroke-width="1.5"/>
-    <path d="M 108 31 L 114 38 L 116 30" fill="#FFF9C4" stroke="#F9E547" stroke-width="1.2"/>
-    <text x="116" y="28" font-family="Nunito,Arial,sans-serif" font-size="10" font-weight="800" fill="#EE4D2D" text-anchor="middle">Hi!</text>
-  </svg>
+  <!-- Header mascots: real PNG characters flanking the title -->
+  <img class="header-mascot header-mascot-left"
+       src="assets/sophie-greeting-hi@2x.png"
+       alt="Sophie waving hi" draggable="false">
+  <img class="header-mascot header-mascot-right"
+       src="assets/sean-peeking@2x.png"
+       alt="Sean peeking" draggable="false">
 </div>
 
 <div class="main">
@@ -169,85 +81,11 @@
 
 <!-- Mascot celebration: appears when a note is pinned -->
 <div class="mascot-celebrate hidden" id="mascotCelebrate">
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 145">
-    <!-- Sparkles -->
-    <g fill="#FFD600">
-      <polygon points="10,12 12,18 18,18 13,22 15,28 10,24 5,28 7,22 2,18 8,18"/>
-      <polygon points="118,8 120,14 126,14 121,18 123,24 118,20 113,24 115,18 110,14 116,14" transform="scale(0.8) translate(18,2)"/>
-      <polygon points="6,80 7.5,84.5 12,84.5 8.5,87 10,91.5 6,89 2,91.5 3.5,87 0,84.5 4.5,84.5" transform="scale(0.9) translate(118,10)"/>
-    </g>
-    <!-- Body/dress -->
-    <ellipse cx="65" cy="126" rx="24" ry="17" fill="#EE4D2D"/>
-    <text x="65" y="132" font-family="Arial Black,sans-serif" font-size="16" font-weight="900" fill="white" text-anchor="middle">S</text>
-    <!-- Arms raised in celebration -->
-    <path d="M 41 112 Q 26 94 20 82" fill="none" stroke="#FFDBB4" stroke-width="9" stroke-linecap="round"/>
-    <circle cx="18" cy="79" r="7" fill="#FFDBB4"/>
-    <path d="M 89 112 Q 104 94 110 82" fill="none" stroke="#FFDBB4" stroke-width="9" stroke-linecap="round"/>
-    <circle cx="112" cy="79" r="7" fill="#FFDBB4"/>
-    <!-- Neck -->
-    <rect x="55" y="106" width="20" height="10" rx="5" fill="#FFDBB4"/>
-    <!-- Face -->
-    <circle cx="65" cy="82" r="30" fill="#FFDBB4"/>
-    <!-- Hair base -->
-    <ellipse cx="65" cy="60" rx="27" ry="22" fill="#EE4D2D"/>
-    <!-- Hair spikes -->
-    <ellipse cx="46" cy="50" rx="11" ry="16" fill="#EE4D2D" transform="rotate(-28,46,50)"/>
-    <ellipse cx="65" cy="44" rx="10" ry="17" fill="#D84315"/>
-    <ellipse cx="84" cy="50" rx="11" ry="16" fill="#EE4D2D" transform="rotate(28,84,50)"/>
-    <!-- Pink bow -->
-    <path d="M 40 56 C 30 48 32 38 42 44 C 46 46 46 54 40 56Z" fill="#FF80AB"/>
-    <path d="M 40 56 C 30 64 32 72 42 66 C 46 64 46 56 40 56Z" fill="#F50057"/>
-    <path d="M 60 56 C 70 48 68 38 58 44 C 54 46 54 54 60 56Z" fill="#FF80AB"/>
-    <path d="M 60 56 C 70 64 68 72 58 66 C 54 64 54 56 60 56Z" fill="#F50057"/>
-    <circle cx="50" cy="56" r="6" fill="#FF4081"/>
-    <!-- Happy squinting eyes (excited) -->
-    <path d="M 42 82 Q 49 75 56 82" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
-    <path d="M 74 82 Q 81 75 88 82" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round"/>
-    <!-- Cheeks -->
-    <ellipse cx="42" cy="89" rx="8" ry="6" fill="rgba(255,100,120,0.42)"/>
-    <ellipse cx="88" cy="89" rx="8" ry="6" fill="rgba(255,100,120,0.42)"/>
-    <!-- Big open smile -->
-    <path d="M 48 96 Q 65 112 82 96" fill="#EE4D2D" stroke="#333" stroke-width="1"/>
-    <path d="M 51 96 Q 65 108 79 96" fill="white"/>
-  </svg>
+  <img src="assets/sophie-cheering@2x.png" alt="" draggable="false">
 </div>
 
 <div class="footer">
-  <!-- Footer mascot: bowing/thank you pose -->
-  <svg class="footer-mascot" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130 120" aria-hidden="true">
-    <!-- Body leaning forward (bow) -->
-    <ellipse cx="65" cy="105" rx="30" ry="14" fill="#EE4D2D"/>
-    <text x="65" y="110" font-family="Arial Black,sans-serif" font-size="14" font-weight="900" fill="white" text-anchor="middle">S</text>
-    <!-- Arms out front (bowing) -->
-    <path d="M 38 90 Q 20 102 12 108" fill="none" stroke="#FFDBB4" stroke-width="8" stroke-linecap="round"/>
-    <circle cx="10" cy="110" r="6" fill="#FFDBB4"/>
-    <path d="M 92 90 Q 110 102 118 108" fill="none" stroke="#FFDBB4" stroke-width="8" stroke-linecap="round"/>
-    <circle cx="120" cy="110" r="6" fill="#FFDBB4"/>
-    <!-- Neck -->
-    <rect x="57" y="82" width="16" height="10" rx="4" fill="#FFDBB4"/>
-    <!-- Head tilted forward -->
-    <circle cx="65" cy="62" r="26" fill="#FFDBB4"/>
-    <!-- Hair base -->
-    <ellipse cx="65" cy="43" rx="24" ry="19" fill="#EE4D2D"/>
-    <!-- Hair spikes -->
-    <ellipse cx="48" cy="36" rx="10" ry="14" fill="#EE4D2D" transform="rotate(-25,48,36)"/>
-    <ellipse cx="65" cy="31" rx="9" ry="15" fill="#D84315"/>
-    <ellipse cx="82" cy="36" rx="10" ry="14" fill="#EE4D2D" transform="rotate(25,82,36)"/>
-    <!-- Pink bow -->
-    <path d="M 43 42 C 34 35 36 26 44 31 C 47 33 47 40 43 42Z" fill="#FF80AB"/>
-    <path d="M 43 42 C 34 49 36 56 44 51 C 47 49 47 42 43 42Z" fill="#F50057"/>
-    <path d="M 60 42 C 69 35 67 26 59 31 C 56 33 56 40 60 42Z" fill="#FF80AB"/>
-    <path d="M 60 42 C 69 49 67 56 59 51 C 56 49 56 42 60 42Z" fill="#F50057"/>
-    <circle cx="51" cy="42" r="5" fill="#FF4081"/>
-    <!-- Closed happy eyes (bowing smile) -->
-    <path d="M 52 62 Q 58 56 64 62" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round"/>
-    <path d="M 66 62 Q 72 56 78 62" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- Cheeks -->
-    <ellipse cx="44" cy="68" rx="7" ry="5" fill="rgba(255,100,120,0.38)"/>
-    <ellipse cx="86" cy="68" rx="7" ry="5" fill="rgba(255,100,120,0.38)"/>
-    <!-- Smile -->
-    <path d="M 52 72 Q 65 81 78 72" fill="none" stroke="#444" stroke-width="2" stroke-linecap="round"/>
-  </svg>
+  <img class="footer-mascot" src="assets/sean-terima-kasih-bow@2x.png" alt="" draggable="false">
   <p>Made with 🧡 by your Shopee team • Pin your note above!</p>
 </div>
 
